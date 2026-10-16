@@ -1,0 +1,99 @@
+{{template "cabecera" .}}
+{{$v := .Vehiculo}}{{$vendedor := .Vendedor}}{{$total := len $v.Fotos}}
+  <main class="section-wrap detail">
+    <nav class="detail-back">
+      {{if .Admin}}<a href="/panel">← Volver al panel de administración</a>{{else}}<a href="/#catalogo">← Volver al catálogo</a>{{end}}
+    </nav>
+    {{template "aviso" .}}
+
+    <div class="detail-layout">
+      <section class="detail-media" id="galeria" aria-label="Fotos del vehículo">
+        {{if $v.Fotos}}
+        <div class="detail-carousel">
+          {{range $i, $f := $v.Fotos}}
+          <a class="detail-slide" id="foto-{{$i}}" href="#ampliar-{{$i}}" title="Ver en grande">
+            <img src="/fotos/{{$f}}" alt="Foto {{sumar $i 1}} de {{$total}}">
+            <span class="detail-zoom">⤢ Ampliar · {{sumar $i 1}}/{{$total}}</span>
+          </a>
+          {{end}}
+        </div>
+        {{if gt $total 1}}
+        <div class="detail-thumbs">
+          {{range $i, $f := $v.Fotos}}<a href="#foto-{{$i}}" aria-label="Ir a la foto {{sumar $i 1}}"><img src="/fotos/{{$f}}" alt=""></a>{{end}}
+        </div>
+        {{end}}
+        {{else}}
+        <div class="detail-empty"><span class="vehicle-glyph">🚙</span><p>El vendedor no subió fotos.</p></div>
+        {{end}}
+      </section>
+
+      <aside class="panel detail-summary">
+        <p class="eyebrow">{{$v.Marca}} · MODELO {{$v.Anio}}</p>
+        <h1 class="detail-title">{{$v.Titulo}}</h1>
+        <p class="detail-price">{{precio $v.PrecioCentavos}}</p>
+        {{if .Admin}}<span class="status-pill status-{{$v.Estado}}">{{estado $v.Estado}}</span>{{end}}
+
+        <div class="seller-card">
+          <p class="eyebrow">INFORMACIÓN DEL VENDEDOR</p>
+          <p class="seller-name">{{$vendedor.Nombre}}</p>
+          <dl class="seller-data">
+            <dt>Teléfono</dt><dd><a href="tel:+{{telefonoIntl $vendedor.Telefono}}">{{$vendedor.Telefono}}</a></dd>
+            <dt>Correo</dt><dd><a href="mailto:{{$vendedor.Email}}">{{$vendedor.Email}}</a></dd>
+            {{if .Admin}}
+            <dt>Rol</dt><dd>{{if $vendedor.EsAdmin}}Administrador{{else}}Vendedor{{end}}</dd>
+            <dt>Registrado el</dt><dd>{{fecha $vendedor.CreadoEn}}</dd>
+            <dt>ID de cuenta</dt><dd class="mono">{{$vendedor.ID}}</dd>
+            {{end}}
+          </dl>
+          <div class="seller-actions">
+            <a class="button button-dark" href="https://wa.me/{{telefonoIntl $vendedor.Telefono}}" target="_blank" rel="noopener noreferrer">WhatsApp ↗</a>
+            <a class="button button-outline" href="mailto:{{$vendedor.Email}}">Enviar correo</a>
+          </div>
+        </div>
+
+        {{if .Admin}}
+        <div class="admin-actions">
+          <p class="eyebrow">MODERACIÓN</p>
+          <div class="row-actions">
+            {{if eq $v.Estado "pending"}}
+            <form method="post" action="/panel/admin/vehiculos/{{$v.ID}}/aprobar"><button class="button button-dark" type="submit">Aprobar publicación</button></form>
+            {{end}}
+            <form method="post" action="/panel/admin/vehiculos/{{$v.ID}}/eliminar"><button class="button button-danger" type="submit">Eliminar publicación</button></form>
+            {{if not $vendedor.EsAdmin}}
+            <form method="post" action="/panel/admin/usuarios/{{$vendedor.ID}}/eliminar"><button class="button button-danger" type="submit">Eliminar cuenta del vendedor</button></form>
+            {{end}}
+          </div>
+        </div>
+        {{end}}
+      </aside>
+    </div>
+
+    <section class="panel detail-specs">
+      <h3>Ficha del vehículo</h3>
+      <dl class="spec-list">
+        <div><dt>Marca</dt><dd>{{$v.Marca}}</dd></div>
+        <div><dt>Modelo (año)</dt><dd>{{$v.Anio}}</dd></div>
+        <div><dt>Precio</dt><dd>{{precio $v.PrecioCentavos}}</dd></div>
+        <div><dt>Fotos</dt><dd>{{$total}}</dd></div>
+        <div><dt>Publicado el</dt><dd>{{fecha $v.CreadoEn}}</dd></div>
+        {{if .Admin}}
+        <div><dt>Estado</dt><dd>{{estado $v.Estado}}</dd></div>
+        <div><dt>ID de publicación</dt><dd class="mono">{{$v.ID}}</dd></div>
+        {{end}}
+      </dl>
+      <h3>Descripción del vendedor</h3>
+      <p class="detail-description">{{$v.Descripcion}}</p>
+    </section>
+
+    {{range $i, $f := $v.Fotos}}
+    <div class="lightbox" id="ampliar-{{$i}}" role="dialog" aria-label="Foto {{sumar $i 1}} de {{$total}}">
+      <a class="lightbox-backdrop" href="#foto-{{$i}}" aria-label="Cerrar"></a>
+      <img src="/fotos/{{$f}}" alt="Foto {{sumar $i 1}} de {{$total}}">
+      <a class="lightbox-close" href="#foto-{{$i}}" aria-label="Cerrar">×</a>
+      {{if gt $i 0}}<a class="lightbox-nav lightbox-prev" href="#ampliar-{{sumar $i -1}}" aria-label="Foto anterior">‹</a>{{end}}
+      {{if lt (sumar $i 1) $total}}<a class="lightbox-nav lightbox-next" href="#ampliar-{{sumar $i 1}}" aria-label="Foto siguiente">›</a>{{end}}
+      <div class="lightbox-bar"><span>{{sumar $i 1}} / {{$total}}</span><a href="/fotos/{{$f}}" target="_blank" rel="noopener">Abrir original ↗</a></div>
+    </div>
+    {{end}}
+  </main>
+{{template "pie" .}}

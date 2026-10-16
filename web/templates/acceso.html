@@ -1,0 +1,44 @@
+{{template "cabecera" .}}
+  <main class="auth-page">
+    <section class="auth-dialog auth-card">
+      <div class="dialog-brand"><span class="brand-mark">A</span></div>
+      {{if .Registro}}
+        <p class="eyebrow">ÚNETE A AUTOMARKET</p>
+        <h2>Crea tu cuenta</h2>
+        <p class="dialog-subtitle">Regístrate para publicar y administrar tus vehículos.</p>
+      {{else}}
+        <p class="eyebrow">BIENVENIDO A AUTOMARKET</p>
+        <h2>Qué bueno tenerte aquí</h2>
+        <p class="dialog-subtitle">Ingresa a tu cuenta para continuar.</p>
+      {{end}}
+      <div class="auth-tabs">
+        <a class="auth-tab{{if not .Registro}} active{{end}}" href="/ingresar">Iniciar sesión</a>
+        <a class="auth-tab{{if .Registro}} active{{end}}" href="/registro">Crear cuenta</a>
+      </div>
+      {{with .Aviso}}<p class="form-error" role="alert">{{.Mensaje}}</p>{{end}}
+      <form method="post" action="{{if .Registro}}/registro{{else}}/ingresar{{end}}">
+        {{if .Registro}}
+          <label class="form-field">Nombre completo<input name="nombre" autocomplete="name" required minlength="2" maxlength="120"></label>
+          <label class="form-field">Teléfono<input name="telefono" autocomplete="tel" required minlength="7" maxlength="32" placeholder="+57 300 000 0000"></label>
+        {{end}}
+        <label class="form-field">Correo electrónico<input name="email" type="email" autocomplete="email" required maxlength="254"></label>
+        <div class="form-field">
+          <label for="clave">Contraseña</label>
+          {{/* Sin JS no se puede cambiar type="password"; el campo se enmascara con CSS
+               (-webkit-text-security) y la casilla del ojo lo destapa. */}}
+          <div class="password-field">
+            <input class="password-toggle-check" id="ver-clave" type="checkbox">
+            <input class="password-input" id="clave" name="clave" type="text" autocomplete="{{if .Registro}}new-password{{else}}current-password{{end}}"
+                   spellcheck="false" autocapitalize="off" autocorrect="off" required {{if .Registro}}minlength="12"{{end}} maxlength="1024">
+            <label class="password-toggle" for="ver-clave" title="Mostrar u ocultar la contraseña">
+              <span class="ojo-cerrado" aria-hidden="true">👁</span><span class="ojo-abierto" aria-hidden="true">🙈</span>
+              <span class="sr-only">Mostrar contraseña</span>
+            </label>
+          </div>
+          {{if .Registro}}<small>Debe tener al menos 12 caracteres.</small>{{end}}
+        </div>
+        <button class="button button-dark button-full" type="submit">{{if .Registro}}Crear cuenta{{else}}Iniciar sesión{{end}}</button>
+      </form>
+    </section>
+  </main>
+{{template "pie" .}}
