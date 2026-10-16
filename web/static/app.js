@@ -7,6 +7,7 @@
   const notice = document.querySelector("#notice");
   const searchInput = document.querySelector("#search-input");
   const yearInput = document.querySelector("#year-input");
+  const apiBase = (window.AUTOMARKET_API_BASE || "").replace(/\/+$/, "");
   let currentUser = null;
   let vehicles = [];
   let authMode = "login";
@@ -22,7 +23,7 @@
     const headers = new Headers(options.headers || {});
     if (options.body) headers.set("Content-Type", "application/json");
     if (token()) headers.set("Authorization", `Bearer ${token()}`);
-    const response = await fetch(path, { ...options, headers });
+    const response = await fetch(`${apiBase}${path}`, { ...options, headers });
     if (response.status === 204) return null;
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {

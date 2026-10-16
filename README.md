@@ -1,113 +1,44 @@
-# AutoMarket AAA
+# AutoMarket — Frontend
 
-Aplicación web de compraventa de vehículos y API de referencia para el taller de
-Authentication, Authorization y Accounting (AAA). Gin enruta la API REST y
-renderiza la plantilla HTML de la interfaz. La única dependencia externa directa
-es Gin; el resto usa la biblioteca estándar de Go.
+Interfaz web estática de AutoMarket. Este repositorio contiene únicamente el
+frontend; el servicio REST debe ejecutarse y desplegarse por separado.
 
-## Requisitos y ejecución
+## Interfaz
 
-- Go 1.22 o posterior.
-- PowerShell en Windows o una terminal equivalente.
+- Catálogo público con búsqueda por marca, modelo y año.
+- Registro e inicio de sesión de vendedores.
+- Panel de vendedor para publicar vehículos y marcar sus publicaciones como
+  vendidas.
+- Panel de administrador para aprobar o eliminar publicaciones y administrar
+  cuentas.
+- Diseño adaptable a móviles y escritorio.
 
-Configura estas variables antes de iniciar el servidor:
+## Desarrollo local
 
-| Variable | Requisito | Uso |
-| --- | --- | --- |
-| `ADMIN_EMAIL` | Dirección de correo válida | Cuenta administradora inicial |
-| `ADMIN_PASSWORD` | Entre 12 y 1024 bytes | Contraseña inicial del administrador |
-| `AUDIT_KEY` | Al menos 32 bytes aleatorios | Clave HMAC de la bitácora; debe conservarse |
-| `AUDIT_LOG_PATH` | Opcional, predeterminado `audit.log` | Ruta del archivo de auditoría |
-| `PORT` | Opcional, predeterminado `8080` | Puerto HTTP |
+Sirve la carpeta `web` con cualquier servidor de archivos estáticos. En VS Code
+se puede abrir `web/index.html` con Live Server. La URL que se usa
+para abrir la aplicación depende de la herramienta elegida.
 
-Desde PowerShell:
+## Conexión al backend
 
-```powershell
-$env:ADMIN_EMAIL = "admin@automarket.local"
-$env:ADMIN_PASSWORD = "cambia-esta-clave-por-una-segura"
-$env:AUDIT_KEY = "reemplaza-por-una-clave-aleatoria-de-al-menos-32-bytes"
-go mod tidy
-go run .
+Edita `web/static/config.js` y asigna la URL base del backend:
+
+```js
+window.AUTOMARKET_API_BASE = "https://api.example.com";
 ```
 
-La cuenta administradora se crea al arrancar. Por decisión de alcance, usuarios,
-vehículos y sesiones viven en memoria y se pierden al reiniciar. La bitácora sí
-se conserva en disco. El servidor se detiene si la bitácora no pasa la
-verificación HMAC; no cambies `AUDIT_KEY` mientras conserves ese archivo.
+El frontend añade a esa URL las rutas `/api/...`. Si el frontend y el backend
+usan el mismo origen, deja el valor vacío. Para usarlos en orígenes distintos,
+el backend debe permitir mediante CORS el origen del frontend y los encabezados
+`Authorization` y `Content-Type`.
 
-Abre `http://localhost:8080` en el navegador para usar AutoMarket. La interfaz
-permite explorar y buscar vehículos como visitante, registrarse e iniciar
-sesión como vendedor, administrar publicaciones propias, y aprobar o eliminar
-publicaciones y cuentas desde el panel de administrador. La API JSON sigue
-disponible bajo `/api`.
+El backend conectado debe implementar los endpoints de usuario, sesión,
+vehículos, vendedor y administración consumidos por `web/static/app.js`. Este
+repositorio no incluye servidor ni almacenamiento de datos.
 
-## API
+## Publicación
 
-Todas las rutas usan el prefijo `/api`. Los cuerpos JSON rechazan propiedades no
-reconocidas y tienen un límite de 1 MiB.
-
-| Método y ruta | Acceso | Función |
-| --- | --- | --- |
-| `POST /api/users` | Público | Registrar vendedor |
-| `POST /api/sessions` | Público | Iniciar sesión y obtener token Bearer |
-| `GET /api/vehicles` | Público | Listar publicaciones aprobadas |
-| `GET /api/vehicles/:id` | Público | Ver vehículo publicado y contacto del vendedor |
-| `GET /api/me` | Vendedor o administrador | Consultar la cuenta autenticada |
-| `GET /api/my/vehicles` | Vendedor | Consultar sus publicaciones |
-| `POST /api/vehicles` | Vendedor | Crear publicación en estado `pending` |
-| `POST /api/vehicles/:id/sold` | Dueño vendedor | Reportar venta |
-| `GET /api/admin/users` | Administrador | Consultar cuentas registradas |
-| `GET /api/admin/vehicles` | Administrador | Consultar todas las publicaciones |
-| `GET /api/admin/vehicles/pending` | Administrador | Consultar publicaciones por aprobar |
-| `POST /api/admin/vehicles/:id/approve` | Administrador | Aprobar publicación pendiente |
-| `DELETE /api/admin/vehicles/:id` | Administrador | Eliminar publicación |
-| `DELETE /api/admin/users/:id` | Administrador | Eliminar usuario y sus publicaciones |
-
-Para las rutas protegidas, envía `Authorization: Bearer <access_token>`. Los
-tokens aleatorios vencen a las 8 horas. El registro asigna siempre el rol
-`seller`; el cliente no puede asignarse privilegios administrativos. No se
-incluye una ruta para promover usuarios.
-
-Ejemplo de registro:
-
-```json
-{
-  "name": "Ana Pérez",
-  "email": "ana@example.com",
-  "phone": "+57 300 000 0000",
-  "password": "una-clave-segura"
-}
-```
-
-Ejemplo de publicación:
-
-```json
-{
-  "title": "Sedán usado en buen estado",
-  "make": "Toyota",
-  "model": "Corolla",
-  "year": 2022,
-  "price_cents": 8500000000,
-  "description": "Mantenimiento al día."
-}
-```
-
-`price_cents` es un entero en centavos de la moneda que defina el equipo. El
-catálogo solo expone vehículos en estado `published`, e incluye nombre, correo
-y teléfono del vendedor para cumplir la historia del visitante.
-
-## AAA implementado
-
-- **Authentication:** registro e inicio de sesión con tokens aleatorios Bearer;
-  contraseña derivada con PBKDF2-HMAC-SHA-256 usando `crypto` estándar, sal
-  aleatoria y comparación en tiempo constante.
-- **Authorization:** middleware de Gin verifica identidad y rol; las
-  operaciones de vendedor comprueban además propiedad del vehículo. La
-  autorización también se valida al modificar datos.
-- **Accounting:** cada solicitud, incluso las rechazadas, produce un registro
-  JSON sin cuerpo ni credenciales. Los registros se encadenan con HMAC-SHA-256,
-  se sincronizan al disco y se verifican al iniciar.
-
-El taller exige HTTP sin TLS para esta entrega. Por ello, no expongas este
-servidor a redes públicas ni uses credenciales reales; HTTP transmite los
-tokens sin cifrar.
+Despliega el contenido de `web` en un hosting de sitios estáticos y configura
+`web/static/config.js` con la URL pública del backend. No incluyas credenciales
+ni tokens en ese archivo: los tokens de sesión se mantienen en el almacenamiento
+de sesión del navegador.
