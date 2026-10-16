@@ -1,0 +1,80 @@
+{{template "cabecera" .}}
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-dot"></span> EL CAMINO A TU PRÓXIMO AUTO</p>
+        <h1>Encuentra el auto<br>que <span>va contigo.</span></h1>
+        <p class="hero-description">Vehículos seleccionados, vendedores reales y una forma más sencilla de encontrar tu próximo viaje.</p>
+        <a class="button button-dark button-large" href="#catalogo">Explorar vehículos <span aria-hidden="true">↗</span></a>
+        <div class="hero-proof"><span class="proof-stars">★★★★★</span><span>Un mercado más simple y transparente</span></div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="sun"></div>
+        <div class="road road-back"></div>
+        <div class="car">
+          <div class="car-window"></div>
+          <div class="car-body"></div>
+          <div class="wheel wheel-one"></div><div class="wheel wheel-two"></div>
+          <div class="car-light"></div>
+        </div>
+        <div class="road road-front"></div>
+        <div class="art-label"><span class="art-label-icon">✦</span><span><b>Tu próximo capítulo</b><small>empieza aquí</small></span></div>
+      </div>
+    </section>
+
+    <form class="search-strip" method="get" action="/#catalogo" aria-label="Buscar vehículos">
+      <div class="search-intro"><span class="search-icon">⌕</span><span><b>¿Qué estás buscando?</b><small>Encuentra tu próximo vehículo</small></span></div>
+      <label class="search-field"><span>Marca o modelo</span><input name="q" type="search" value="{{.Q}}" placeholder="Ej. Toyota Corolla"></label>
+      <label class="search-field search-year"><span>Año desde</span><input name="anio" type="number" min="1886" value="{{.Anio}}" placeholder="Cualquiera"></label>
+      <button class="button button-dark search-button" type="submit">Buscar <span aria-hidden="true">→</span></button>
+    </form>
+
+    <section class="catalog section-wrap" id="catalogo">
+      <div class="section-heading">
+        <div><p class="eyebrow">SELECCIÓN PARA TI</p><h2>Vehículos destacados</h2></div>
+        <span class="result-count">{{len .Vehiculos}} {{if eq (len .Vehiculos) 1}}vehículo{{else}}vehículos{{end}}</span>
+      </div>
+      {{template "aviso" .}}
+      {{if .Vehiculos}}
+      <div class="vehicle-grid">
+        {{range .Vehiculos}}
+        <article class="vehicle-card">
+          {{if .Fotos}}
+          <div class="vehicle-photo vehicle-photo-real">
+            <div class="vehicle-gallery">{{range .Fotos}}<img src="/fotos/{{.}}" alt="Foto del vehículo" loading="lazy">{{end}}</div>
+            <span class="photo-tag">{{if gt (len .Fotos) 1}}DESLIZA · {{len .Fotos}} FOTOS{{else}}VERIFICADO POR AUTOMARKET{{end}}</span>
+          </div>
+          {{else}}
+          <div class="vehicle-photo"><span class="photo-tag">VERIFICADO POR AUTOMARKET</span><span class="vehicle-glyph">🚙</span></div>
+          {{end}}
+          <div class="vehicle-info">
+            <h3 class="vehicle-title"><a class="card-link" href="/vehiculos/{{.ID}}">{{.Titulo}}</a></h3>
+            <div class="vehicle-meta"><span>{{.Marca}}</span><span class="separator"></span><span>Modelo {{.Anio}}</span></div>
+            <p class="vehicle-description">{{.Descripcion}}</p>
+            <div class="vehicle-bottom">
+              <span class="vehicle-price">{{precio .PrecioCentavos}}</span>
+              <a class="seller-link" href="/vehiculos/{{.ID}}">Ver detalle y contacto ↗</a>
+            </div>
+            {{with .Vendedor}}<p class="seller-contact">{{.Nombre}} · {{.Telefono}} · {{.Email}}</p>{{end}}
+          </div>
+        </article>
+        {{end}}
+      </div>
+      {{else}}
+      <div class="empty-state">
+        <span class="empty-icon">⌕</span><h3>No encontramos vehículos</h3>
+        <p>Prueba otra búsqueda o vuelve más tarde para ver nuevas publicaciones.</p>
+        <a class="button button-outline" href="/#catalogo">Limpiar búsqueda</a>
+      </div>
+      {{end}}
+    </section>
+
+    {{if not (and .Usuario .Usuario.EsAdmin)}}
+    <section class="seller-callout">
+      <div class="callout-decoration" aria-hidden="true">✳</div>
+      <div><p class="eyebrow">¿LISTO PARA VENDER?</p><h2>Tu próximo comprador<br>está buscando.</h2><p>Publica tu vehículo y conecta con personas listas para encontrarlo.</p></div>
+      <a class="button button-light" href="{{if .Usuario}}/panel{{else}}/registro{{end}}">Publicar mi vehículo <span aria-hidden="true">↗</span></a>
+    </section>
+    {{end}}
+  </main>
+{{template "pie" .}}

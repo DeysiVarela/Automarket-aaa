@@ -1,0 +1,67 @@
+{{template "cabecera" .}}
+  <main class="workspace section-wrap">
+    <div class="section-heading">
+      <div><p class="eyebrow">TU ESPACIO</p><h2>Panel de vendedor</h2></div>
+    </div>
+    {{template "aviso" .}}
+    <div class="workspace-content">
+      <section class="panel" id="publicar">
+        <h3>Publica un vehículo</h3>
+        <p class="panel-subtitle">Tu anuncio quedará pendiente hasta que un administrador lo revise.</p>
+        {{$campos := .Borrador.Campos}}
+        <form class="listing-form" method="post" action="/panel/vehiculos" enctype="multipart/form-data">
+          <label class="form-field span-two">Título del anuncio<input name="titulo" required maxlength="120" value="{{$campos.Titulo}}" placeholder="Ej. Toyota Corolla XEi 1.8 automático"></label>
+          <label class="form-field">Marca
+            <select name="marca" required>
+              <option value="" disabled{{if not $campos.Marca}} selected{{end}}>Selecciona una marca</option>
+              {{range .Marcas}}<option{{if eq . $campos.Marca}} selected{{end}}>{{.}}</option>{{end}}
+            </select>
+          </label>
+          <label class="form-field">Modelo (año)<input name="anio" type="number" required min="1886" max="{{.AnioMax}}" value="{{$campos.Anio}}" placeholder="Ej. 2018"></label>
+          <label class="form-field span-two">Precio en pesos colombianos<input name="precio" type="number" required min="1" step="1" value="{{$campos.Precio}}"></label>
+          <label class="form-field span-two">Descripción<textarea name="descripcion" required maxlength="4000">{{$campos.Descripcion}}</textarea></label>
+
+          <div class="form-field span-two">Fotos del vehículo ({{len .Borrador.Fotos}} de {{.MaxFotos}})
+            {{with .Borrador.Fotos}}
+            <div class="upload-preview">
+              {{range $i, $f := .}}
+              <figure class="upload-item">
+                <img src="/panel/borrador/fotos/{{$f.ID}}" alt="Foto {{$f.Nombre}}">
+                {{if eq $i 0}}<span class="upload-cover">PORTADA</span>{{end}}
+                <button class="upload-remove" type="submit" formaction="/panel/borrador/fotos/{{$f.ID}}/quitar" formnovalidate aria-label="Quitar foto" title="Quitar foto">×</button>
+              </figure>
+              {{end}}
+            </div>
+            {{end}}
+            {{if lt (len .Borrador.Fotos) .MaxFotos}}
+            <div class="upload-picker">
+              <input name="fotos" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+              <button class="button button-small button-outline" type="submit" formaction="/panel/borrador/fotos" formnovalidate>Cargar fotos</button>
+            </div>
+            {{end}}
+            <span class="form-help">Elige las fotos y pulsa «Cargar fotos» para verlas antes de publicar. JPG, PNG o WebP de máximo 5 MB; la primera será la portada.</span>
+          </div>
+          <button class="button button-dark" type="submit">Enviar a revisión</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h3>Mis publicaciones</h3>
+        <div class="dashboard-list">
+          {{range .Vehiculos}}
+          <div class="dashboard-row">
+            {{template "fila-vehiculo" .}}
+            {{if eq .Estado "published"}}
+            <div class="row-actions">
+              <form method="post" action="/panel/vehiculos/{{.ID}}/vendido"><button class="button button-small button-outline" type="submit">Marcar vendido</button></form>
+            </div>
+            {{end}}
+          </div>
+          {{else}}
+          <p class="dashboard-empty">Todavía no tienes vehículos publicados.</p>
+          {{end}}
+        </div>
+      </section>
+    </div>
+  </main>
+{{template "pie" .}}

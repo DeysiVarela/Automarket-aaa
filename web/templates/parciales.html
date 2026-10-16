@@ -1,0 +1,50 @@
+{{define "cabecera"}}<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Encuentra y publica vehículos en AutoMarket.">
+  <title>AutoMarket | Compra y vende tu próximo vehículo</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="AutoMarket, inicio">
+      <span class="brand-mark">A</span>
+      <span>auto<span class="brand-accent">market</span></span>
+    </a>
+    <nav class="top-actions" aria-label="Navegación principal">
+      <a class="nav-link" href="/#catalogo">Explorar</a>
+      {{if .Usuario}}
+        <div class="account-menu">
+          <span class="account-name">{{.Usuario.Nombre}}</span>
+          <a class="button button-quiet" href="/panel">Mi panel</a>
+          <form method="post" action="/salir"><button class="button button-quiet" type="submit">Salir</button></form>
+        </div>
+      {{else}}
+        <a class="button button-quiet" href="/ingresar">Iniciar sesión</a>
+        <a class="button button-dark" href="/registro">Publicar vehículo</a>
+      {{end}}
+    </nav>
+  </header>
+{{end}}
+
+{{define "aviso"}}{{with .Aviso}}<div class="notice{{if .Error}} error{{end}}" role="status">{{.Mensaje}}</div>{{end}}{{end}}
+
+{{define "pie"}}
+  <footer class="footer"><a class="brand footer-brand" href="/"><span class="brand-mark">A</span><span>auto<span class="brand-accent">market</span></span></a><span>Tu próximo viaje empieza aquí.</span><a href="#">Volver arriba ↑</a></footer>
+</body>
+</html>
+{{end}}
+
+{{define "fila-vehiculo"}}
+  <div class="row-info">
+    {{if .Fotos}}<img class="row-thumb" src="/fotos/{{index .Fotos 0}}" alt="" loading="lazy">{{else}}<span class="row-thumb row-thumb-empty">🚙</span>{{end}}
+    <div class="dashboard-row-main">
+      <div class="dashboard-row-title">{{.Titulo}}</div>
+      <div class="dashboard-row-meta">{{.Marca}} · Modelo {{.Anio}} · {{precio .PrecioCentavos}} · {{len .Fotos}} foto(s)</div>
+      {{with .Vendedor}}<div class="dashboard-row-meta">Vendedor: {{.Nombre}} · {{.Telefono}} · {{.Email}}</div>{{end}}
+    </div>
+  </div>
+  <span class="status-pill status-{{.Estado}}">{{estado .Estado}}</span>
+{{end}}

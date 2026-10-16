@@ -1,0 +1,54 @@
+{{template "cabecera" .}}
+  <main class="workspace section-wrap">
+    <div class="section-heading">
+      <div><p class="eyebrow">ADMINISTRACIÓN</p><h2>Panel de administración</h2></div>
+    </div>
+    {{template "aviso" .}}
+    <div class="workspace-content">
+      <section class="panel">
+        <h3>Gestión de publicaciones</h3>
+        <div class="dashboard-list">
+          {{range .Vehiculos}}
+          <div class="dashboard-row">
+            {{template "fila-vehiculo" .}}
+            <div class="row-actions">
+              <a class="button button-small button-outline" href="/panel/admin/vehiculos/{{.ID}}">Ver detalle</a>
+              {{if eq .Estado "pending"}}
+              <form method="post" action="/panel/admin/vehiculos/{{.ID}}/aprobar"><button class="button button-small button-dark" type="submit">Aprobar</button></form>
+              {{end}}
+              <form method="post" action="/panel/admin/vehiculos/{{.ID}}/eliminar"><button class="button button-small button-danger" type="submit">Eliminar</button></form>
+            </div>
+          </div>
+          {{else}}
+          <p class="dashboard-empty">No hay publicaciones.</p>
+          {{end}}
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3>Cuentas registradas</h3>
+        <p class="panel-subtitle">La contraseña y los datos de autenticación nunca se muestran.</p>
+        <div class="dashboard-list">
+          {{range .Usuarios}}
+          <div class="dashboard-row">
+            <div class="dashboard-row-main">
+              <div class="dashboard-row-title">{{.Nombre}}</div>
+              <div class="dashboard-row-meta">{{.Email}} · {{.Telefono}}</div>
+            </div>
+            {{if .EsAdmin}}
+              <span class="status-pill status-published">Admin</span>
+            {{else}}
+              <span class="status-pill">Vendedor</span>
+              <div class="row-actions">
+                <form method="post" action="/panel/admin/usuarios/{{.ID}}/eliminar"><button class="button button-small button-danger" type="submit">Eliminar cuenta</button></form>
+              </div>
+            {{end}}
+          </div>
+          {{else}}
+          <p class="dashboard-empty">No hay cuentas registradas.</p>
+          {{end}}
+        </div>
+      </section>
+    </div>
+  </main>
+{{template "pie" .}}

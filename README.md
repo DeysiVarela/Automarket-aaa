@@ -1,44 +1,45 @@
 # AutoMarket — Frontend
 
-Interfaz web estática de AutoMarket. Este repositorio contiene únicamente el
-frontend; el servicio REST debe ejecutarse y desplegarse por separado.
+Interfaz web de AutoMarket escrita en **Go + Gin** (sin JavaScript). Las páginas se
+generan en el servidor con `html/template` y los datos se obtienen de la API REST del
+backend ([AutoMarket-Phantom-Back](https://github.com/JuanferCalle/AutoMarket-Phantom-Back)).
+El navegador solo recibe HTML y CSS; las acciones son formularios (POST → redirección).
 
-## Interfaz
+## Ejecutar
 
-- Catálogo público con búsqueda por marca, modelo y año.
-- Registro e inicio de sesión de vendedores.
-- Panel de vendedor para publicar vehículos y marcar sus publicaciones como
-  vendidas.
-- Panel de administrador para aprobar o eliminar publicaciones y administrar
-  cuentas.
-- Diseño adaptable a móviles y escritorio.
+Primero el backend (`go run ./cmd/server -demo` en su repo), luego:
 
-## Desarrollo local
-
-Sirve la carpeta `web` con cualquier servidor de archivos estáticos. En VS Code
-se puede abrir `web/index.html` con Live Server. La URL que se usa
-para abrir la aplicación depende de la herramienta elegida.
-
-## Conexión al backend
-
-Edita `web/static/config.js` y asigna la URL base del backend:
-
-```js
-window.AUTOMARKET_API_BASE = "https://api.example.com";
+```bash
+go run .     # http://localhost:3000
 ```
 
-El frontend añade a esa URL las rutas `/api/...`. Si el frontend y el backend
-usan el mismo origen, deja el valor vacío. Para usarlos en orígenes distintos,
-el backend debe permitir mediante CORS el origen del frontend y los encabezados
-`Authorization` y `Content-Type`.
+| Variable   | Por defecto             |
+|------------|-------------------------|
+| `PUERTO`   | `3000`                  |
+| `BACK_URL` | `http://localhost:8080` |
 
-El backend conectado debe implementar los endpoints de usuario, sesión,
-vehículos, vendedor y administración consumidos por `web/static/app.js`. Este
-repositorio no incluye servidor ni almacenamiento de datos.
+## Estructura
 
-## Publicación
+```text
+main.go                 arranque; incrusta web/ con embed
+internal/cliente/       cliente de la API del backend (net/http)
+internal/web/           router Gin, handlers, sesión por cookie y funciones de plantilla
+web/templates/          páginas: inicio, acceso, vendedor, admin y parciales
+web/static/styles.css   estilos
+```
 
-Despliega el contenido de `web` en un hosting de sitios estáticos y configura
-`web/static/config.js` con la URL pública del backend. No incluyas credenciales
-ni tokens en ese archivo: los tokens de sesión se mantienen en el almacenamiento
-de sesión del navegador.
+## Páginas
+
+| Ruta | Rol | Uso |
+|---|---|---|
+| `/` | Visitante | Catálogo con búsqueda por marca/modelo y año, con contacto del vendedor |
+| `/ingresar`, `/registro` | Todos | Inicio de sesión y registro de vendedores |
+| `/panel` | Vendedor | Publicar vehículos y marcarlos como vendidos |
+| `/panel` | Administrador | Aprobar o eliminar publicaciones y eliminar cuentas |
+
+## Sesión
+
+El token que entrega el backend se guarda en la cookie `automarket_sesion`
+(`HttpOnly`, `SameSite=Lax`) y el front lo envía como `Authorization: Bearer` en cada
+llamada a la API. La autorización por rol la decide siempre el backend. El front
+reenvía la IP del navegador en `X-Forwarded-For` para la auditoría.
