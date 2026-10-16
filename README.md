@@ -1,8 +1,9 @@
-# AutoMarket AAA API
+# AutoMarket AAA
 
-Backend de referencia para el taller de implementación de Authentication,
-Authorization y Accounting (AAA). La única dependencia externa directa es Gin;
-el resto usa la biblioteca estándar de Go.
+Aplicación web de compraventa de vehículos y API de referencia para el taller de
+Authentication, Authorization y Accounting (AAA). Gin enruta la API REST y
+renderiza la plantilla HTML de la interfaz. La única dependencia externa directa
+es Gin; el resto usa la biblioteca estándar de Go.
 
 ## Requisitos y ejecución
 
@@ -34,6 +35,12 @@ vehículos y sesiones viven en memoria y se pierden al reiniciar. La bitácora s
 se conserva en disco. El servidor se detiene si la bitácora no pasa la
 verificación HMAC; no cambies `AUDIT_KEY` mientras conserves ese archivo.
 
+Abre `http://localhost:8080` en el navegador para usar AutoMarket. La interfaz
+permite explorar y buscar vehículos como visitante, registrarse e iniciar
+sesión como vendedor, administrar publicaciones propias, y aprobar o eliminar
+publicaciones y cuentas desde el panel de administrador. La API JSON sigue
+disponible bajo `/api`.
+
 ## API
 
 Todas las rutas usan el prefijo `/api`. Los cuerpos JSON rechazan propiedades no
@@ -45,8 +52,12 @@ reconocidas y tienen un límite de 1 MiB.
 | `POST /api/sessions` | Público | Iniciar sesión y obtener token Bearer |
 | `GET /api/vehicles` | Público | Listar publicaciones aprobadas |
 | `GET /api/vehicles/:id` | Público | Ver vehículo publicado y contacto del vendedor |
+| `GET /api/me` | Vendedor o administrador | Consultar la cuenta autenticada |
+| `GET /api/my/vehicles` | Vendedor | Consultar sus publicaciones |
 | `POST /api/vehicles` | Vendedor | Crear publicación en estado `pending` |
 | `POST /api/vehicles/:id/sold` | Dueño vendedor | Reportar venta |
+| `GET /api/admin/users` | Administrador | Consultar cuentas registradas |
+| `GET /api/admin/vehicles` | Administrador | Consultar todas las publicaciones |
 | `GET /api/admin/vehicles/pending` | Administrador | Consultar publicaciones por aprobar |
 | `POST /api/admin/vehicles/:id/approve` | Administrador | Aprobar publicación pendiente |
 | `DELETE /api/admin/vehicles/:id` | Administrador | Eliminar publicación |

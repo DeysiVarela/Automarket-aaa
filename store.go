@@ -325,6 +325,47 @@ func (s *store) pendingVehicles() []vehicle {
 	return result
 }
 
+func (s *store) allVehicles() []vehicle {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	result := make([]vehicle, 0, len(s.vehicles))
+	for _, item := range s.vehicles {
+		result = append(result, item)
+	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].CreatedAt.After(result[j].CreatedAt)
+	})
+	return result
+}
+
+func (s *store) sellerVehicles(sellerID string) []vehicle {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	result := make([]vehicle, 0)
+	for _, item := range s.vehicles {
+		if item.SellerID == sellerID {
+			result = append(result, item)
+		}
+	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].CreatedAt.After(result[j].CreatedAt)
+	})
+	return result
+}
+
+func (s *store) listUsers() []userResponse {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	result := make([]userResponse, 0, len(s.users))
+	for _, account := range s.users {
+		result = append(result, toUserResponse(account))
+	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].CreatedAt.Before(result[j].CreatedAt)
+	})
+	return result
+}
+
 func (s *store) reportSold(sellerID, vehicleID string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()

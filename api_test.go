@@ -165,6 +165,82 @@ func TestRegistrationRejectsClientSuppliedRole(t *testing.T) {
 	}
 }
 
+func TestWebInterfaceAndRoleSpecificEndpoints(t *testing.T) {
+	router, _, adminToken := newTestAPI(t)
+
+	response := performRequest(router, http.MethodGet, "/", "", nil)
+	if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), "AutoMarket") {
+		t.Fatalf("web interface: got %d: %s", response.Code, response.Body)
+	}
+	response = performRequest(router, http.MethodGet, "/static/app.js", "", nil)
+	if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), "/api/vehicles") {
+		t.Fatalf("web application script: got %d", response.Code)
+	}
+
+	response = performRequest(router, http.MethodPost, "/api/users", "", map[string]any{
+		"name": "Ana Pérez", "email": "ana@example.com",
+		"phone": "+57 300 000 0000", "password": "ana-secure-password",
+	})
+	if response.Code != http.StatusCreated {
+		t.Fatalf("register seller: got %d: %s", response.Code, response.Body)
+	}
+	response = performRequest(router, http.MethodPost, "/api/sessions", "", map[string]string{
+		"email": "ana@example.com", "password": "ana-secure-password",
+	})
+	if response.Code != http.StatusOK {
+		t.Fatalf("login seller: got %d: %s", response.Code, response.Body)
+	}
+	var loginResult struct {
+		AccessToken string `json:"access_token"`
+	}
+	loginResult = decodeResponse[struct {
+		AccessToken string `json:"access_token"`
+	}](t, response)
+	sellerToken := loginResult.AccessToken
+
+	response = performRequest(router, http.MethodGet, "/api/me", sellerToken, nil)
+	if response.Code != http.StatusOK {
+		t.Fatalf("get current seller: got %d: %s", response.Code, response.Body)
+	}
+	if account := decodeResponse[userResponse](t, response); account.Email != "ana@example.com" {
+		t.Fatalf("current user endpoint returned unexpected account: %+v", account)
+	}
+
+	response = performRequest(router, http.MethodGet, "/api/my/vehicles", sellerToken, nil)
+	if response.Code != http.StatusOK {
+		t.Fatalf("list seller vehicles: got %d: %s", response.Code, response.Body)
+	}
+	sellerVehicles := decodeResponse[struct {
+		Vehicles []vehicle `json:"vehicles"`
+	}](t, response)
+	if len(sellerVehicles.Vehicles) != 0 {
+		t.Fatalf("new seller should have no vehicles, got %d", len(sellerVehicles.Vehicles))
+	}
+
+	response = performRequest(router, http.MethodGet, "/api/admin/users", sellerToken, nil)
+	if response.Code != http.StatusForbidden {
+		t.Fatalf("seller accessing user administration: got %d, want %d", response.Code, http.StatusForbidden)
+	}
+	response = performRequest(router, http.MethodGet, "/api/admin/vehicles", sellerToken, nil)
+	if response.Code != http.StatusForbidden {
+		t.Fatalf("seller accessing all vehicle administration: got %d, want %d", response.Code, http.StatusForbidden)
+	}
+	response = performRequest(router, http.MethodGet, "/api/admin/vehicles", adminToken, nil)
+	if response.Code != http.StatusOK {
+		t.Fatalf("admin listing all vehicles: got %d: %s", response.Code, response.Body)
+	}
+	response = performRequest(router, http.MethodGet, "/api/admin/users", adminToken, nil)
+	if response.Code != http.StatusOK {
+		t.Fatalf("admin listing users: got %d: %s", response.Code, response.Body)
+	}
+	users := decodeResponse[struct {
+		Users []userResponse `json:"users"`
+	}](t, response)
+	if len(users.Users) != 2 {
+		t.Fatalf("admin should see both accounts, got %d", len(users.Users))
+	}
+}
+
 func TestAuditLogDetectsTampering(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "audit.log")
 	key := bytes.Repeat([]byte("k"), 32)

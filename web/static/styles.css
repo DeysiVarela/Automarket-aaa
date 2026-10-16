@@ -1,0 +1,129 @@
+:root{font-family:"Segoe UI",Arial,sans-serif;color:#20251f;background:#f7f8f5;font-synthesis:none;text-rendering:optimizeLegibility;font-weight:400;--ink:#20251f;--muted:#72796f;--line:#e6e9e2;--green:#a9ef5b;--dark:#20251f;--paper:#fff}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-width:320px}
+button,input{font:inherit}
+button,a{-webkit-tap-highlight-color:transparent}
+a{color:inherit;text-decoration:none}
+.hidden{display:none!important}
+.topbar{height:78px;padding:0 max(5.5vw,24px);display:flex;align-items:center;justify-content:space-between;background:rgba(247,248,245,.92);border-bottom:1px solid rgba(32,37,31,.06);position:sticky;top:0;z-index:5;backdrop-filter:blur(14px)}
+.brand{display:inline-flex;align-items:center;gap:10px;font-family:Manrope,sans-serif;font-weight:800;font-size:20px;letter-spacing:-1px}
+.brand-mark{width:32px;height:32px;display:grid;place-items:center;background:var(--green);border-radius:10px;font-size:17px;letter-spacing:-1px}
+.brand-accent{color:#82b83f}
+.top-actions{display:flex;align-items:center;gap:12px}
+.nav-link{font-size:14px;color:#555d53;margin-right:15px}
+.button{border:0;border-radius:9px;padding:12px 17px;font-weight:700;font-size:13px;cursor:pointer;transition:transform .18s,background .18s,box-shadow .18s;display:inline-flex;align-items:center;justify-content:center;gap:12px}
+.button:hover{transform:translateY(-1px)}
+.button-dark{background:var(--dark);color:#fff}
+.button-dark:hover{background:#303a2f;box-shadow:0 7px 20px #20251f25}
+.button-quiet{background:transparent;color:#343a33}
+.button-quiet:hover{background:#ecefe9}
+.button-large{padding:15px 20px;margin-top:7px}
+.button-light{background:var(--green);color:#20251f}
+.button-outline{background:transparent;border:1px solid #d9ded5;color:var(--ink)}
+.button-full{width:100%;margin-top:8px}
+.account-menu{display:flex;gap:12px;align-items:center}
+.account-name{font-size:13px;font-weight:700}
+.hero{padding:72px max(8.3vw,32px) 70px;min-height:490px;display:grid;grid-template-columns:1fr .9fr;align-items:center;gap:25px;max-width:1500px;margin:auto;overflow:hidden}
+.eyebrow{font-size:10px;letter-spacing:1.7px;color:#76806d;font-weight:700;margin:0 0 16px}
+.eyebrow-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#96d64c;margin-right:8px}
+h1,h2,h3,p{margin-top:0}
+h1,h2{font-family:"Segoe UI",Arial,sans-serif;letter-spacing:-2.5px}
+h1{font-size:clamp(43px,5.7vw,74px);line-height:1.07;margin:0 0 20px;font-weight:700}
+h1 span{color:#80b341}
+.hero-description{color:#737b70;font-size:15px;line-height:1.8;max-width:420px;margin:0 0 24px}
+.hero-proof{display:flex;align-items:center;gap:10px;font-size:11px;color:#7d8479;margin-top:24px}
+.proof-stars{letter-spacing:2px;color:#e6a643}
+.hero-art{height:342px;position:relative;border-radius:46% 54% 51% 49%/55% 48% 52% 45%;background:#eaf3df;overflow:hidden}
+.sun{position:absolute;width:115px;height:115px;border-radius:50%;background:#d9edbd;top:38px;right:14%;box-shadow:0 0 0 18px #d9edbd55}
+.road{position:absolute;left:-8%;width:120%;height:170px;background:#d5e5c7;transform:rotate(-10deg);border-radius:50%}
+.road-back{bottom:52px}
+.road-front{bottom:-98px;background:#bad99e}
+.car{position:absolute;left:19%;right:12%;bottom:102px;height:118px}
+.car-body{position:absolute;left:0;right:0;bottom:17px;height:57px;background:#303d34;border-radius:55% 25% 13% 15%/75% 50% 22% 25%;box-shadow:inset 0 -9px #263129}
+.car-body:before{content:"";position:absolute;width:45%;height:52px;right:19%;top:-38px;background:#39493d;clip-path:polygon(20% 0,76% 0,100% 100%,0 100%);border-radius:20px 30px 0 0}
+.car-window{position:absolute;z-index:1;width:30%;height:36px;right:25%;top:-30px;background:#b5d5b0;clip-path:polygon(22% 0,75% 0,100% 100%,0 100%)}
+.wheel{position:absolute;z-index:2;width:40px;height:40px;border-radius:50%;background:#1d241f;border:8px solid #6f796d;bottom:0}
+.wheel-one{left:17%}.wheel-two{right:19%}
+.car-light{position:absolute;right:4px;bottom:40px;background:#e8edbb;width:10px;height:13px;border-radius:4px}
+.art-label{position:absolute;right:5%;bottom:8%;display:flex;gap:10px;align-items:center;background:#fff;padding:12px 16px;border-radius:12px;box-shadow:0 12px 30px #3b49302a;font-size:11px}
+.art-label-icon{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:#f0f7e9;color:#7dae42;font-size:18px}
+.art-label b,.art-label small{display:block}.art-label small{color:#899083;margin-top:3px}
+.search-strip{max-width:1060px;margin:-8px auto 78px;background:#fff;border:1px solid #e9ece6;box-shadow:0 15px 38px #2833210c;padding:14px;display:flex;align-items:center;gap:10px;border-radius:14px;position:relative;z-index:1}
+.search-intro{display:flex;align-items:center;gap:12px;min-width:235px;padding:0 15px}
+.search-icon{font-size:31px;color:#87b748;line-height:1}
+.search-intro b,.search-intro small{display:block}.search-intro b{font-size:13px}.search-intro small{font-size:10px;color:#92988e;margin-top:5px}
+.search-field{padding:3px 15px;border-left:1px solid var(--line);flex:1;min-width:100px}
+.search-field span{display:block;font-size:10px;color:#8a9086;margin-bottom:5px}
+.search-field input{width:100%;border:0;outline:0;color:var(--ink);font-size:12px;background:transparent}
+.search-button{min-width:118px}
+.section-wrap{max-width:1180px;padding:0 36px;margin:0 auto 90px}
+.section-heading{display:flex;align-items:end;justify-content:space-between;margin-bottom:24px}
+.section-heading .eyebrow{margin-bottom:8px}
+h2{font-size:34px;line-height:1.15;margin:0;font-weight:700}
+.result-count{font-size:12px;color:#81887e;padding-bottom:5px}
+.vehicle-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.vehicle-card{border:1px solid #e8ebe5;border-radius:14px;background:#fff;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.vehicle-card:hover{transform:translateY(-3px);box-shadow:0 14px 30px #232b2012}
+.vehicle-photo{height:175px;background:linear-gradient(145deg,#e9f1e1,#d4e5c4);display:grid;place-items:center;position:relative}
+.vehicle-photo:before{content:"";position:absolute;inset:22px;border:1px solid #ffffff80;border-radius:50%}
+.vehicle-glyph{font-size:63px;filter:drop-shadow(0 10px 5px #35402c2b)}
+.photo-tag{position:absolute;top:13px;left:13px;background:#ffffffd9;border-radius:6px;padding:6px 9px;font-size:9px;font-weight:700;color:#64715a}
+.vehicle-info{padding:17px}
+.vehicle-title{font-family:"Segoe UI",Arial,sans-serif;font-weight:700;font-size:16px;letter-spacing:-.4px;margin:0 0 7px}
+.vehicle-meta{font-size:11px;color:#838a80;display:flex;gap:8px;align-items:center}
+.vehicle-meta .separator{width:3px;height:3px;border-radius:50%;background:#a9afa4}
+.vehicle-description{font-size:11px;line-height:1.6;color:#767e73;min-height:35px;margin:13px 0}
+.vehicle-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:13px;border-top:1px solid #eff0ed}
+.vehicle-price{font-family:"Segoe UI",Arial,sans-serif;font-size:17px;font-weight:800;letter-spacing:-.5px}
+.seller-link{font-size:10px;color:#729c3e;font-weight:700}
+.seller-contact{font-size:10px;color:#7e867b;margin-top:8px}
+.notice{padding:12px 15px;border-radius:9px;background:#f1f7e9;color:#425833;font-size:13px;margin-bottom:16px}
+.notice.error{background:#fff0ed;color:#a13b2d}
+.empty-state{text-align:center;padding:65px 20px;border:1px dashed #dce2d7;border-radius:14px;background:#fbfcfa}
+.empty-icon{font-size:36px;color:#94bc66}.empty-state h3{font-family:"Segoe UI",Arial,sans-serif;margin:10px 0}.empty-state p{font-size:13px;color:#7a8277;margin-bottom:18px}
+.seller-callout{margin:0 auto 95px;max-width:1110px;background:#242d25;color:#fff;border-radius:17px;padding:43px 7%;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden}
+.seller-callout .eyebrow{color:#b7d49c;margin-bottom:12px}
+.seller-callout h2{font-size:34px;line-height:1.18;margin-bottom:13px}
+.seller-callout p:not(.eyebrow){font-size:12px;color:#b9c1b6;margin-bottom:0}
+.callout-decoration{position:absolute;right:28%;top:-58px;color:#ffffff08;font-size:240px;line-height:1}
+.seller-callout .button{z-index:1}
+.workspace{padding-top:12px}
+.workspace-content{display:grid;grid-template-columns:1fr;gap:22px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px}
+.panel h3{font-family:"Segoe UI",Arial,sans-serif;font-size:17px;margin:0 0 16px}
+.panel-subtitle{font-size:12px;color:#81887e;margin:-9px 0 18px}
+.listing-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.form-field{display:flex;flex-direction:column;gap:7px;font-size:11px;color:#626a5f;font-weight:600}
+.form-field input,.form-field textarea{width:100%;border:1px solid #e2e6df;border-radius:8px;padding:11px 12px;outline:none;color:var(--ink);font-size:12px;background:#fff}
+.form-field input:focus,.form-field textarea:focus{border-color:#96c45c;box-shadow:0 0 0 3px #a9ef5b30}
+.form-field textarea{min-height:85px;resize:vertical}
+.span-two{grid-column:span 2}
+.form-help{font-size:10px;color:#8a9187;font-weight:400}
+.listing-form .button{justify-self:start}
+.dashboard-list{display:flex;flex-direction:column;gap:9px}
+.dashboard-row{display:flex;align-items:center;justify-content:space-between;gap:15px;border:1px solid #edf0ea;padding:12px 13px;border-radius:9px}
+.dashboard-row-main{min-width:0}.dashboard-row-title{font-weight:700;font-size:12px}.dashboard-row-meta{font-size:10px;color:#838a80;margin-top:5px}
+.status-pill{display:inline-block;border-radius:20px;padding:5px 9px;font-size:9px;font-weight:700;background:#fff5dc;color:#99701a;white-space:nowrap}
+.status-published{background:#edf6e5;color:#56813a}.status-sold{background:#f0f0ee;color:#777d74}
+.row-actions{display:flex;gap:7px;align-items:center;flex-shrink:0}
+.button-small{padding:8px 10px;font-size:10px;border-radius:7px}
+.button-danger{background:#fff0ed;color:#a14336}.button-danger:hover{background:#ffe0da}
+.dashboard-empty{font-size:12px;color:#858c82;padding:12px 0}
+.footer{border-top:1px solid var(--line);padding:24px max(5.5vw,24px);display:flex;align-items:center;justify-content:space-between;color:#828980;font-size:11px}
+.footer-brand{color:var(--ink);font-size:16px}.footer-brand .brand-mark{width:27px;height:27px;font-size:14px;border-radius:8px}
+.auth-dialog{width:min(440px,calc(100% - 30px));border:0;border-radius:17px;padding:33px 35px 30px;box-shadow:0 25px 90px #1c261b35;color:var(--ink)}
+.auth-dialog::backdrop{background:#16201590;backdrop-filter:blur(4px)}
+.dialog-close{position:absolute;right:17px;top:13px;border:0;background:transparent;font-size:25px;cursor:pointer;color:#838a80}
+.dialog-brand{margin-bottom:17px}.auth-dialog .eyebrow{margin-bottom:9px}.auth-dialog h2{font-size:25px;letter-spacing:-1px}
+.dialog-subtitle{font-size:12px;color:#828980;margin:9px 0 20px}
+.auth-tabs{display:flex;border-bottom:1px solid var(--line);margin-bottom:20px}
+.auth-tab{border:0;background:none;padding:11px 0;margin-right:24px;color:#858c82;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent}
+.auth-tab.active{color:var(--ink);border-color:#8cc34b}
+.auth-dialog form{display:grid;gap:13px}
+.auth-dialog .form-field input{margin-top:1px}
+.auth-dialog .form-field small{font-size:10px;color:#92988e;font-weight:400}
+.form-error{margin:0;background:#fff0ed;color:#a13b2d;padding:10px;border-radius:7px;font-size:11px}
+@media(max-width:900px){.hero{padding-left:6vw;padding-right:6vw}.search-strip{margin-left:24px;margin-right:24px}.seller-callout{margin-left:24px;margin-right:24px}.vehicle-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.topbar{height:66px;padding:0 17px}.brand{font-size:17px}.brand-mark{width:29px;height:29px}.nav-link{display:none}.top-actions{gap:5px}.top-actions>.button{font-size:11px;padding:10px}.account-name{display:none}.hero{grid-template-columns:1fr;padding:54px 25px 45px;gap:29px}.hero-art{height:245px;max-width:450px;width:100%;justify-self:center}.car{transform:scale(.83);transform-origin:bottom center;left:10%;right:4%}.search-strip{margin:0 17px 58px;display:grid;grid-template-columns:1fr 1fr}.search-intro{grid-column:span 2;padding:4px 8px}.search-field{border-left:0;padding:8px;border-top:1px solid var(--line)}.search-year{border-left:1px solid var(--line)}.search-button{grid-column:span 2;width:100%}.section-wrap{padding:0 18px;margin-bottom:65px}.section-heading{align-items:start;gap:10px}h2{font-size:28px}.vehicle-grid{grid-template-columns:1fr;gap:14px}.vehicle-photo{height:185px}.seller-callout{margin:0 17px 65px;padding:29px 24px;display:block}.seller-callout h2{font-size:29px}.seller-callout .button{margin-top:22px}.listing-form{grid-template-columns:1fr}.span-two{grid-column:auto}.dashboard-row{align-items:flex-start;flex-wrap:wrap}.row-actions{margin-left:auto}.footer{padding:22px 17px;gap:12px;flex-wrap:wrap}.footer>span{display:none}.auth-dialog{padding:29px 23px 24px}.workspace .section-heading{margin-bottom:17px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important}}

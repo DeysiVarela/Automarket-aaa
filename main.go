@@ -1,6 +1,7 @@
 package main
 
 import (
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -53,9 +54,17 @@ func main() {
 }
 
 func registerRoutes(router *gin.Engine, store *store) {
+	router.SetHTMLTemplate(template.Must(template.ParseFS(webFiles, "web/templates/*.html")))
+	router.StaticFS("/static", http.FS(webStaticFiles))
+	router.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", nil)
+	})
+
 	router.POST("/api/users", registerHandler(store))
 	router.POST("/api/sessions", loginHandler(store))
 
+	router.GET("/api/me", requireRole(store, roleSeller, roleAdmin), currentUserHandler())
+	router.GET("/api/my/vehicles", requireRole(store, roleSeller), listSellerVehiclesHandler(store))
 	router.GET("/api/vehicles", listPublicVehiclesHandler(store))
 	router.GET("/api/vehicles/:id", getPublicVehicleHandler(store))
 
@@ -66,6 +75,8 @@ func registerRoutes(router *gin.Engine, store *store) {
 
 	admins := router.Group("/api/admin")
 	admins.Use(requireRole(store, roleAdmin))
+	admins.GET("/users", listUsersHandler(store))
+	admins.GET("/vehicles", listAdminVehiclesHandler(store))
 	admins.GET("/vehicles/pending", listPendingVehiclesHandler(store))
 	admins.POST("/vehicles/:id/approve", approveVehicleHandler(store))
 	admins.DELETE("/vehicles/:id", deleteVehicleHandler(store))

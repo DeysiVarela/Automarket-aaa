@@ -74,6 +74,30 @@ func loginHandler(accounts *store) gin.HandlerFunc {
 	}
 }
 
+func currentUserHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		account, exists := c.Get("actor_user")
+		if !exists {
+			writeError(c, http.StatusUnauthorized, "authentication required")
+			return
+		}
+		c.JSON(http.StatusOK, account)
+	}
+}
+
+func listSellerVehiclesHandler(accounts *store) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		actorID, _ := c.Get("actor_id")
+		c.JSON(http.StatusOK, gin.H{"vehicles": accounts.sellerVehicles(actorID.(string))})
+	}
+}
+
+func listUsersHandler(accounts *store) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"users": accounts.listUsers()})
+	}
+}
+
 func listPublicVehiclesHandler(accounts *store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"vehicles": accounts.publicVehicles()})
@@ -134,6 +158,12 @@ func reportSoldHandler(accounts *store) gin.HandlerFunc {
 func listPendingVehiclesHandler(accounts *store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"vehicles": accounts.pendingVehicles()})
+	}
+}
+
+func listAdminVehiclesHandler(accounts *store) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"vehicles": accounts.allVehicles()})
 	}
 }
 

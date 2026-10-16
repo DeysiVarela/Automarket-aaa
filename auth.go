@@ -84,6 +84,7 @@ func requireRole(accounts *store, allowed ...role) gin.HandlerFunc {
 		}
 		c.Set("actor_id", account.ID)
 		c.Set("actor_role", string(account.Role))
+		c.Set("actor_user", account)
 		if _, ok := allowedRoles[account.Role]; !ok {
 			writeError(c, 403, "operation not permitted for this role")
 			return
