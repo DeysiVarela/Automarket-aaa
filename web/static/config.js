@@ -1,1 +1,0 @@
-window.AUTOMARKET_API_BASE = "";
