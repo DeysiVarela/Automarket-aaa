@@ -1,53 +1,77 @@
-# AutoMarket — Frontend
+# AutoMarket
 
-Interfaz web estática de AutoMarket. Este repositorio contiene únicamente el
-frontend; el servicio REST debe ejecutarse y desplegarse por separado.
+Interfaz web para consultar, publicar y administrar anuncios de vehículos. El
+repositorio incluye dos presentaciones que consumen el backend REST separado
+[AutoMarket-Phantom-Back](https://github.com/JuanferCalle/AutoMarket-Phantom-Back):
 
-## Interfaz
+- Una aplicación Go + Gin con páginas renderizadas mediante `html/template`.
+- Una interfaz estática con HTML, CSS y JavaScript, que ofrece búsqueda y
+  galerías navegables de fotos.
+
+## Ejecutar
+
+Primero inicia el backend AutoMarket-Phantom-Back (por ejemplo,
+`go run ./cmd/server -demo` desde su repositorio). Luego, desde este repositorio,
+inicia la aplicación Gin:
+
+```bash
+go run .
+```
+
+Abre `http://localhost:3000/` para la interfaz Gin o
+`http://localhost:3000/spa/` para la interfaz estática integrada.
+
+| Variable | Valor predeterminado |
+|---|---|
+| `PUERTO` | `3000` |
+| `BACK_URL` | `http://localhost:8080` |
+
+Para servir la interfaz estática de forma independiente, sirve la carpeta `web`
+con un servidor de archivos estáticos y abre `web/index.html`.
+
+## Funcionalidades
 
 - Catálogo público con búsqueda por marca, título del anuncio y año.
-- Las publicaciones con varias fotos permiten desplazarse horizontalmente por
-  su galería desde la tarjeta del catálogo con las teclas de flecha izquierda y
-  derecha o con el gesto horizontal en una pantalla táctil.
+- Galerías de fotos desplazables con el gesto horizontal o las flechas del
+  teclado.
 - Registro e inicio de sesión de vendedores.
-- Panel de vendedor para publicar vehículos y marcar sus publicaciones como
-  vendidas.
-- Panel de administrador para aprobar o eliminar publicaciones y administrar
+- Panel de vendedor para publicar vehículos, consultar el estado de sus anuncios
+  y marcar vehículos publicados como vendidos.
+- Panel de administrador para revisar y aprobar publicaciones y administrar
   cuentas.
 - Diseño adaptable a móviles y escritorio.
 
-## Desarrollo local
+La aprobación de un anuncio gestiona su publicación en el sistema; no certifica
+la condición mecánica ni legal del vehículo.
 
-Sirve la carpeta `web` con cualquier servidor de archivos estáticos. En VS Code
-se puede abrir `web/index.html` con Live Server. La URL que se usa
-para abrir la aplicación depende de la herramienta elegida.
+## Estructura
 
-## Conexión al backend
+```text
+main.go                 arranque Gin; incrusta web/ con embed
+internal/cliente/       cliente HTTP de la API del backend
+internal/web/           router Gin, handlers, sesión y funciones de plantilla
+web/templates/          páginas renderizadas por Gin
+web/index.html          interfaz estática
+web/static/app.js       lógica de la interfaz estática
+web/static/styles.css   estilos compartidos por ambas interfaces
+web/static/config.js    URL base de la API para la interfaz estática
+```
 
-La configuración local de `web/static/config.js` apunta a `http://localhost:8080`,
-el puerto predeterminado del backend AutoMarket-Phantom-Back. Para otra URL,
-edita ese archivo:
+## Conexión y sesiones
+
+La interfaz Gin usa `BACK_URL` para conectarse al backend. La interfaz estática
+usa `web/static/config.js`, que por defecto apunta a `http://localhost:8080`:
 
 ```js
 window.AUTOMARKET_API_BASE = "https://api.example.com";
 ```
 
-El frontend añade a esa URL las rutas `/api/...`. El API local no habilita CORS
-por defecto: el navegador bloqueará las peticiones entre orígenes mientras el
-backend no permita el origen exacto donde se sirve el frontend, junto con los
-encabezados `Authorization` y `Content-Type`. Abrir el archivo como `file://`
-tampoco sustituye ese permiso. No se agregó CORS ni se modificó el repositorio
-del backend.
+Cuando la interfaz estática se sirve desde un origen diferente al backend, este
+debe permitir dicho origen mediante CORS junto con los encabezados
+`Authorization` y `Content-Type`. La interfaz Gin guarda el token de la API en
+una cookie `HttpOnly` y lo envía como `Authorization: Bearer`. La interfaz
+estática guarda su token en el almacenamiento de sesión del navegador. En ambos
+casos, la autorización final se valida en el backend.
 
-El formulario de publicación usa `multipart/form-data` con hasta cinco fotos
-JPG, PNG o WebP (5 MB por foto), como espera el backend. El catálogo muestra la
-marca, el año, el contacto del vendedor y la primera foto disponible. El
-contrato completo de endpoints está documentado en el README del backend.
-Este repositorio no incluye servidor ni almacenamiento de datos.
-
-## Publicación
-
-Despliega el contenido de `web` en un hosting de sitios estáticos y configura
-`web/static/config.js` con la URL pública del backend. No incluyas credenciales
-ni tokens en ese archivo: los tokens de sesión se mantienen en el almacenamiento
-de sesión del navegador.
+El backend conserva los usuarios y vehículos; este repositorio implementa las
+interfaces y su conexión con la API.
