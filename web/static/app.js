@@ -21,7 +21,7 @@
 
   async function api(path, options = {}) {
     const headers = new Headers(options.headers || {});
-    if (options.body) headers.set("Content-Type", "application/json");
+    if (options.body && !(options.body instanceof FormData)) headers.set("Content-Type", "application/json");
     if (token()) headers.set("Authorization", `Bearer ${token()}`);
     const response = await fetch(`${apiBase}${path}`, { ...options, headers });
     if (response.status === 204) return null;
@@ -59,12 +59,43 @@
     const card = element("article", "vehicle-card");
     const photo = element("div", "vehicle-photo");
     photo.append(element("span", "photo-tag", "VERIFICADO POR AUTOMARKET"));
-    photo.append(element("span", "vehicle-glyph", "🚙"));
+    if (item.photos && item.photos.length) {
+      if (item.photos.length > 1) {
+        photo.classList.add("has-gallery");
+        const gallery = element("div", "vehicle-gallery");
+        gallery.tabIndex = 0;
+        gallery.setAttribute("aria-label", `Galería de fotos de ${item.title}. Usa las flechas izquierda y derecha para recorrerla.`);
+        gallery.addEventListener("keydown", (event) => {
+          if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+          event.preventDefault();
+          gallery.scrollBy({
+            left: (event.key === "ArrowRight" ? 1 : -1) * gallery.clientWidth,
+            behavior: "smooth",
+          });
+        });
+        for (const [index, filename] of item.photos.entries()) {
+          const image = document.createElement("img");
+          image.className = "vehicle-image";
+          image.src = `${apiBase}/api/photos/${encodeURIComponent(filename)}`;
+          image.alt = `Foto ${index + 1} de ${item.title}`;
+          image.loading = "lazy";
+          gallery.append(image);
+        }
+        photo.append(gallery);
+      } else {
+        const image = document.createElement("img");
+        image.className = "vehicle-image";
+        image.src = `${apiBase}/api/photos/${encodeURIComponent(item.photos[0])}`;
+        image.alt = `Foto de ${item.title}`;
+        image.loading = "lazy";
+        photo.append(image);
+      }
+    } else {
+      photo.append(element("span", "vehicle-glyph", "🚙"));
+    }
     const info = element("div", "vehicle-info");
     info.append(element("h3", "vehicle-title", item.title));
     const meta = element("div", "vehicle-meta");
-    meta.append(element("span", "", `${item.make} ${item.model}`));
-    meta.append(element("span", "separator"));
     meta.append(element("span", "", String(item.year)));
     info.append(meta);
     info.append(element("p", "vehicle-description", item.description));
@@ -85,7 +116,7 @@
     const query = searchInput.value.trim().toLocaleLowerCase("es");
     const year = Number(yearInput.value) || 0;
     const visible = vehicles.filter((item) => {
-      const searchable = `${item.title} ${item.make} ${item.model}`.toLocaleLowerCase("es");
+      const searchable = `${item.title} ${item.make}`.toLocaleLowerCase("es");
       return (!query || searchable.includes(query)) && (!year || item.year >= year);
     });
     grid.replaceChildren(...visible.map(vehicleCard));
@@ -133,7 +164,7 @@
     const row = element("div", "dashboard-row");
     const main = element("div", "dashboard-row-main");
     main.append(element("div", "dashboard-row-title", item.title));
-    main.append(element("div", "dashboard-row-meta", `${item.make} ${item.model} · ${item.year} · ${money(item.price_cents)}`));
+    main.append(element("div", "dashboard-row-meta", `${item.make} · ${item.year} · ${money(item.price_cents)}`));
     row.append(main);
     row.append(element("span", `status-pill status-${item.state}`, statusLabel(item.state)));
     if (actions.length) {
@@ -157,7 +188,6 @@
     const fields = [
       ["title", "Título del anuncio", "text", true],
       ["make", "Marca", "text", true],
-      ["model", "Modelo", "text", true],
       ["year", "Año", "number", true],
       ["price", "Precio en pesos colombianos", "number", true],
     ];
@@ -167,9 +197,11 @@
       input.name = name;
       input.type = type;
       input.required = required;
+      if (name === "title") input.maxLength = 120;
+      if (name === "make") input.maxLength = 60;
       if (name === "year") {
         input.min = "1886";
-        input.max = String(new Date().getFullYear() + 1);
+        input.max = "2100";
       }
       if (name === "price") {
         input.min = "1";
@@ -185,6 +217,23 @@
     description.required = true;
     descriptionField.append(description);
     form.append(descriptionField);
+    const photoField = element("label", "form-field span-two", "Fotos del vehículo");
+    const photos = document.createElement("input");
+    photos.name = "photos";
+    photos.type = "file";
+    photos.accept = "image/jpeg,image/png,image/webp";
+    photos.multiple = true;
+    photos.addEventListener("change", () => {
+      if (photos.files.length > 5) {
+        photos.setCustomValidity("Puedes adjuntar hasta 5 fotos.");
+      } else if ([...photos.files].some((file) => file.size > 5 * 1024 * 1024)) {
+        photos.setCustomValidity("Cada foto debe pesar 5 MB o menos.");
+      } else {
+        photos.setCustomValidity("");
+      }
+    });
+    photoField.append(photos, element("small", "form-help", "Opcionales: JPG, PNG o WebP; máximo 5 fotos de 5 MB cada una."));
+    form.append(photoField);
     const formError = element("p", "form-error hidden");
     formError.setAttribute("role", "alert");
     formError.classList.add("span-two");
@@ -195,18 +244,18 @@
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       formError.classList.add("hidden");
-      const values = Object.fromEntries(new FormData(form).entries());
+      const values = new FormData(form);
       try {
+        const payload = new FormData();
+        payload.append("title", values.get("title"));
+        payload.append("make", values.get("make"));
+        payload.append("year", values.get("year"));
+        payload.append("price_cents", String(Math.round(Number(values.get("price")) * 100)));
+        payload.append("description", values.get("description"));
+        for (const photo of photos.files) payload.append("photos", photo);
         await api("/api/vehicles", {
           method: "POST",
-          body: JSON.stringify({
-            title: values.title,
-            make: values.make,
-            model: values.model,
-            year: Number(values.year),
-            price_cents: Math.round(Number(values.price) * 100),
-            description: values.description,
-          }),
+          body: payload,
         });
         form.reset();
         showNotice("Vehículo enviado. Aparecerá en el catálogo cuando sea aprobado.");
