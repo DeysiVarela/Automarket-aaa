@@ -9,7 +9,7 @@ El navegador solo recibe HTML y CSS; las acciones son formularios (POST → redi
 ## Ejecutar
 
 Primero inicia el backend AutoMarket-Phantom-Back (por ejemplo,
-`go run ./cmd/server -demo` desde su repositorio). Luego, desde este repositorio:
+`go run ./cmd/server` desde su repositorio). Luego, desde este repositorio:
 
 ```bash
 go run .     # http://localhost:3000
