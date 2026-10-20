@@ -67,11 +67,6 @@ h2{font-size:34px;line-height:1.15;margin:0;font-weight:700}
 .vehicle-card:hover{transform:translateY(-3px);box-shadow:0 14px 30px #232b2012}
 .vehicle-photo{height:175px;background:linear-gradient(145deg,#e9f1e1,#d4e5c4);display:grid;place-items:center;position:relative}
 .vehicle-photo:before{content:"";position:absolute;inset:22px;border:1px solid #ffffff80;border-radius:50%}
-.vehicle-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.vehicle-photo.has-gallery{display:block}
-.vehicle-gallery{position:absolute;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:thin;overscroll-behavior-x:contain}
-.vehicle-gallery .vehicle-image{position:relative;inset:auto;flex:0 0 100%;scroll-snap-align:start}
-.vehicle-gallery:focus-visible{outline:3px solid #729c3e;outline-offset:-3px}
 .vehicle-glyph{font-size:63px;filter:drop-shadow(0 10px 5px #35402c2b)}
 .photo-tag{position:absolute;z-index:1;top:13px;left:13px;background:#ffffffd9;border-radius:6px;padding:6px 9px;font-size:9px;font-weight:700;color:#64715a}
 .vehicle-info{padding:17px}
