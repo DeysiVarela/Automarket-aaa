@@ -18,14 +18,6 @@ func NuevoRouter(h *Handlers, archivos fs.FS) (*gin.Engine, error) {
 	if err != nil {
 		return nil, err
 	}
-	sitio, err := fs.Sub(archivos, "web")
-	if err != nil {
-		return nil, err
-	}
-	spa, err := fs.ReadFile(sitio, "index.html")
-	if err != nil {
-		return nil, err
-	}
 
 	r := gin.New()
 	if err := r.SetTrustedProxies(nil); err != nil { // el navegador se conecta directo
@@ -34,13 +26,6 @@ func NuevoRouter(h *Handlers, archivos fs.FS) (*gin.Engine, error) {
 	r.Use(gin.Logger(), gin.Recovery())
 	r.SetHTMLTemplate(plantillas)
 	r.StaticFS("/static", http.FS(estaticos))
-	r.StaticFS("/spa/static", http.FS(estaticos))
-	r.GET("/spa", func(c *gin.Context) {
-		c.Redirect(http.StatusPermanentRedirect, "/spa/")
-	})
-	r.GET("/spa/", func(c *gin.Context) {
-		c.Data(http.StatusOK, "text/html; charset=utf-8", spa)
-	})
 	r.GET("/fotos/:nombre", h.Foto) // imágenes de vehículos, servidas desde el backend
 
 	paginas := r.Group("", h.CargarUsuario)
